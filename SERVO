@@ -41,8 +41,8 @@ int main(void)
    PORTC = 0xFF; //Clears all bits 
    //ADCSRA = 0b10000111; //enables ADC and sets freq to 128
 
-  // ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
-   // ADCSRA = 1 << ADEN | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0;
+   ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
+   ADCSRA = 1 << ADEN | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0;
  
 
     while (1)
