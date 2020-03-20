@@ -1,133 +1,129 @@
- 
-/*
+ /*
 
- * GccApplication2.cpp
+  * GccApplication2.cpp
 
- *
+  *
 
- * Created: 2/10/2020 4:18:30 PM
+  * Created: 2/10/2020 4:18:30 PM
 
- * Author : nmk51
+  * Author : nmk51
 
- */ 
+  */
 
-void step_CW(void);
-void step_CCW(void);
-int phase_step = 1;
-#include <avr/io.h>
+  void step_CW(void);
+  void step_CCW(void);
+  int phase_step = 1;
+  #include <avr/io.h>
 
-char sensorval = 0; //dropping last two bits so can be char
+  char sensorval = 0; //dropping last two bits so can be char
 
 
-int main(void)
+  int main(void)
 
-{
-   //int i = 0;
-   DDRC = 0x00;
-   PORTB = 0x00;
-   DDRB = 0xFF;
-   PORTB = 0x00;
-   //MOTOR CONTOLS ARE IN PORTD 
-   //MOTOR 1 are PD4 PD5
-   //MOTOR 2 are PD6 PD7
-   DDRD = 0xff;//LOOK AT THIS I THINK IT SHOULD BE OUTPUT
-  // DDRD = 1 << PD6 | 1<< PD5;
-   //PORTD = 0xFF;
-   //OCR0A = 0x00; //sets duty cycle to zero
-   //TCCR0A = 1 << COM0A1 | 1<< COM0A0 | 1<< WGM01 | 1<< WGM00;
-   //TCCR0B = 0<< CS02 | 1<< CS01 | 1<< CS00;
-   //PRR = 0x00; //clears power reduction
+  {
+	  
+	  DDRC = 0x00;
+	  PORTB = 0x00;
+	  DDRB = 0xFF;
+	  PORTB = 0x00;
+	  //MOTOR CONTOLS ARE IN PORTD
+	  //MOTOR 1 are PD4 PD5
+	  //MOTOR 2 are PD6 PD7
+	  DDRD = 0xff;//LOOK AT THIS I THINK IT SHOULD BE OUTPUT
+	  // DDRD = 1 << PD6 | 1<< PD5;
+	  PORTD = 0xFF;
+	  PRR = 0x00; //clears power reduction
 
-   PORTC = 0xFF; //Clears all bits 
-   //ADCSRA = 0b10000111; //enables ADC and sets freq to 128
+	  PORTC = 0xFF; //Clears all bits
+	  ADCSRA = 0b10000111; //enables ADC and sets freq to 128
 
-   ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
-   ADCSRA = 1 << ADEN | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0;
- 
+	  ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
+	  ADCSRA = 1 << ADEN | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0;
+	  
 
-    while (1)
+	  while (1)
 
-    {
-PORTB = 0x00;
-		ADCSRA |= (1<<ADSC); //Turns bit 6 on to start conversion
+	  {
+		  PORTB = 0x00;
+		  ADCSRA |= (1<<ADSC); //Turns bit 6 on to start conversion
 
-		while ((ADCSRA & (1<<ADIF))==0){ //Checks bit 4 to see if flag is up(finished reading)
+		  while ((ADCSRA & (1<<ADIF))==0){ //Checks bit 4 to see if flag is up(finished reading)
 
-		       sensorval = ADCH; //Reads the sensor val
-               
-	if (sensorval < 127.5) {
-		//CounterClockwise
-		//RED LIGHT ON
-		PORTB = 0b00000100;
-		step_CCW();
-		
-	
-		}
-		
-		if(sensorval >= 127.5){
-        //Clockwise
-		//Green light on
-		PORTB = 0b00000010;
-		step_CCW();
-		}
+			  sensorval = ADCH; //Reads the sensor val
+			  
+			  if (sensorval < 127.5) {
+				  //CounterClockwise
+				  //RED LIGHT ON
+				  PORTB = 0b00000100;
+				  step_CCW();
+				  
+				  
+			  }
+			  
+			  if(sensorval >= 127.5){
+				  //Clockwise
+				  //Green light on
+				  PORTB = 0b00000010;
+				  step_CCW();
+			  }
 
-}
+		  }
 
-		}
-
-    }
+	  }
 
   }
+
+  //}
   
-void step_CW{
-	switch(phase_step){
-	case 1:
-		//step to 4
-		PORTD = 0b00100000;
-		phase_step = 4;
-		break;
-	case 2:
-	    //step to 1 
-	    PORTD = 0b10000000;
-		phase_step = 1;
-		break;
-	case 3:
-	    //step to 2
-		PORTD = 0b00010000;
-		phase_step = 2;
-		break;
-	case 4: 
-	    //step to 3;
-	    PORTD = 0b01000000;
-		phase_step = 3;
-		break;
-		
-	}
-	}//End of CW
-	
-void step_CCW{
-	
-	switch(phase_step){
-		case 1:
-		//step to 4
-		PORTD = 0b00010000;
-		phase_step = 2;
-		break;
-		case 2:
-		//step to 1
-		PORTD = 0b01000000;
-		phase_step = 3;
-		break;
-		case 3:
-		//step to 2
-		PORTD = 0b00100000;
-		phase_step = 4;
-		break;
-		case 4:
-		//step to 3;
-		PORTD = 0b10000000;
-		phase_step = 1;
-		break;
-		
-	}
-	}
+  void step_CW(){
+	  switch(phase_step){
+		  case 1:
+		  //step to 4
+		  PORTD = 0b00100000;
+		  phase_step = 4;
+		  break;
+		  case 2:
+		  //step to 1
+		  PORTD = 0b10000000;
+		  phase_step = 1;
+		  break;
+		  case 3:
+		  //step to 2
+		  PORTD = 0b00010000;
+		  phase_step = 2;
+		  break;
+		  case 4:
+		  //step to 3;
+		  PORTD = 0b01000000;
+		  phase_step = 3;
+		  break;
+		  
+	  }
+  }//End of CW
+  
+  void step_CCW(){
+	  
+	  switch(phase_step){
+		  case 1:
+		  //step to 4
+		  PORTD = 0b00010000;
+		  phase_step = 2;
+		  break;
+		  case 2:
+		  //step to 1
+		  PORTD = 0b01000000;
+		  phase_step = 3;
+		  break;
+		  case 3:
+		  //step to 2
+		  PORTD = 0b00100000;
+		  phase_step = 4;
+		  break;
+		  case 4:
+		  //step to 3;
+		  PORTD = 0b10000000;
+		  phase_step = 1;
+		  break;
+		  
+	  }
+  }//End of CW
