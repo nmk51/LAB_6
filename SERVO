@@ -21,7 +21,7 @@ void delay_1_msec_raw_count();
   //ALL MUST BE INTERGERS BELOW
   int X = 0; //Difference between last value and current value
   int i = 0;//Iteration
-  int N = 0;//Number of steps
+  int Z = 0;//Number of steps
 long freqclk = 16000000; //Clock freq
 
   int main(void){
@@ -70,10 +70,11 @@ long freqclk = 16000000; //Clock freq
 				  wait(250);
 			  }
 			//  X = sensorval - past_value;
-			//N = step/volt*X;
-		//if (X > 0){
+			//Z = 10*X;
+		//if (X > 0 and X > 0.10){
 		//Turn on CW Light
-		//for (i : N){
+		//PORTB = 0b11111101;
+		//for (i : Z){
 		//step_CW();
 		//wait(250);
 		//i++
@@ -81,12 +82,13 @@ long freqclk = 16000000; //Clock freq
 		//}
 		//if(X = 0){
 		//} //DO NOTHING
-		//if(X < 0){
+		//if(X < 0 and X < -0.1){
 		//Turn on Counter Clockwise Light
-		//For(i : N){
+		//PORTB = 0b11111011;
+		//For(i : Z){
 		//step_CCW();
 		//wait(250);
-		i++
+		//i++
 		//}
 		//}
 			  
