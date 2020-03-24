@@ -1,264 +1,279 @@
-  
-  /*
+ /*
 
-  * GccApplication2.cpp
+ * GccApplication2.cpp
 
-  *
+ *
 
-  * Created: 2/10/2020 4:18:30 PM
+ * Created: 2/10/2020 4:18:30 PM
 
-  * Author : nmk51
+ * Author : nmk51
 
-  */
-void wait(volatile int N); //For Delay
-  void step_CW(void);  //CLOCKWISE
-  void step_CCW(void); //COUNTERCLOCKWISE
-  int phase_step = 1;  //MOTOR PHASE
-  #include <avr/io.h>
-void delay_1_msec_raw_count();
-  char sensorval = 0; //dropping last two bits so can be char
-  char pass_value = 0;
-  //ALL MUST BE INTERGERS BELOW
-  int X = 0; //Difference between last value and current value
-  int i = 0;//Iteration
-  int Z = 0;//Number of steps
-long freqclk = 16000000; //Clock freq
+ */
+ void wait(volatile int N); //For Delay
+ void step_CW(void);  //CLOCKWISE
+ void step_CCW(void); //COUNTERCLOCKWISE
+ int phase_step = 1;  //MOTOR PHASE
+ #include <avr/io.h>
+ void delay_1_msec_raw_count();
+ char sensorval = 0; //dropping last two bits so can be char
+ char pass_value = 0;
+ //ALL MUST BE INTERGERS BELOW
+ int X = 0; //Difference between last value and current value
+ int i = 0;//Iteration
+ int Z = 0;//Number of steps
+ long freqclk = 16000000; //Clock freq
 
-  int main(void){
-	  
-	 DDRC = 0x00;
-	  DDRB = 0xFF;
-	  PORTB = 0xFF;
-	  //MOTOR CONTOLS ARE IN PORTD
-	  //MOTOR 1 are PD4 PD5
-	  //MOTOR 2 are PD6 PD7
-	  DDRD = 0xFF;
-	  // DDRD = 1 << PD6 | 1<< PD5;
-	  PORTD = 0x00;
-	  PRR = 0x00; //clears power reduction
-
-	  PORTC = 0x00; //Clears all bits//kkggg
-	  ADCSRA = 0b10000111; //enables ADC and sets freq to 128
-
-	  ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
+ int main(void){
 	 
-	  
+	 DDRC = 0x00;
+	 DDRB = 0xFF;
+	 PORTB = 0xFF;
+	 //MOTOR CONTOLS ARE IN PORTD
+	 //MOTOR 1 are PD4 PD5
+	 //MOTOR 2 are PD6 PD7
+	 DDRD = 0xFF;
+	 // DDRD = 1 << PD6 | 1<< PD5;
+	 PORTD = 0x00;
+	 PRR = 0x00; //clears power reduction
 
-	  while (1)
+	 // PORTC = 0x00; //Clears all bits//kkggg
+	 ADCSRA = 0b10000111; //enables ADC and sets freq to 128
 
-	  {
-		//  PORTB = 0x00;
-		  ADCSRA |= (1<<ADSC); //Turns bit 6 on to start conversion
+	 ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
+	 
+	 
 
-		  while ((ADCSRA & (1<<ADIF))==0){ //Checks bit 4 to see if flag is up(finished reading)
+	 while (1)
 
-			  sensorval = ADCH; //Reads the sensor val
-			  
-			  if (sensorval < 72.5) {
-				  //CounterClockwise
-				  //Green LIGHT ON
-				  PORTB = 0b11111011;
-				  step_CCW();
-				  wait(250);				  
-			  }
-			  
-			  if (sensorval >= 72.5){
-				  //Clockwise
-				  //Red light on
-				  PORTB = 0b11111101;
-				  step_CW();
-				  wait(250);
-			  }
-			//  X = sensorval - past_value;
-			//Z = 10*X;
-		//if (X > 0 and X > 0.10){
-		//Turn on CW Light
-		//PORTB = 0b11111101;
-		//for (i : Z){
-		//step_CW();
-		//wait(250);
-		//i++
-		//}
-		//}
-		//if(X = 0){
-		//} //DO NOTHING
-		//if(X < 0 and X < -0.1){
-		//Turn on Counter Clockwise Light
-		//PORTB = 0b11111011;
-		//For(i : Z){
-		//step_CCW();
-		//wait(250);
-		//i++
-		//}
-		//}
-			  
-			  
-			  
-                   past_value = sensorval;
-		   i = 0;
-		  }
+	 {
+		 //  PORTB = 0x00;
+		 ADCSRA |= (1<<ADSC); //Turns bit 6 on to start conversion
 
-	  }
+		 while ((ADCSRA & (1<<ADIF))==0){ //Checks bit 4 to see if flag is up(finished reading)
 
-  }
+			 sensorval = ADCH; //Reads the sensor val
+			 
+			 //Commenting out to check code///
+			 //if (sensorval < 127.5) {
+			 //CounterClockwise
+			 //Green LIGHT ON
+			 //  PORTB = 0b11111011;
+			 //step_CCW();
+			 //wait(250);
+			 //}
+			 
+			 //if (sensorval >= 127.5){
+			 //Clockwise
+			 //Red light on
+			 // PORTB = 0b11111101;
+			 // step_CW();
+			 //wait(250);
+			 //}
+			 ////END OF COMMENTS//
+			 
+			 //NEED COMMENTING OUT
+			 X = sensorval - pass_value;
+			 Z = (1)*X;
+			 ///taking out
+			 wait(50);
+			 if (X > 0){ //&& X > 5){
+				 //Turn on CW Light
+				 PORTB = 0b11111101;
+				 //for ((i=0);(i=Z);(i++)){
+				for ((i=0);(i<=5);i++){
+					 step_CW();
+					 wait(250);
+					 //i++
+				 }
+			 }
+			 //end
+			 if(X == 0){
+			 } //DO NOTHING
+			 if(X < 0 ){//&& X < -5){
+				 //Turn on Counter Clockwise Light
+				 PORTB = 0b11111011;
+				 //for((i=0);(i=Z);(i++)){
+					 for ((i=0);(i<=5);i++){
+					 step_CCW();
+					 wait(250);
+					 //i++
+				 }
+			 }
+			 ///END OF COMMENTS
+			// X = sensorval/5;
+			 //while (pass_value != sensorval){
+			 //for((i=0);(i>=X);(i++)){
+				// PORTB = 0b11111011;
+				 //step_CCW();
+				 
+			// }
+			 //}
+			  //PORTB = 0b11111111;
+			 pass_value = sensorval;
+			 //i = 0;
+		 }
+//pass_value = sensorval;
+	 }
 
-  //}
-  
-  void step_CW(){
-	  switch(phase_step){
-		  case 1:
-		  //step to 4
-		  PORTD = 0b00100000;
-		  phase_step = 4;
-		  break;
-		  case 2:
-		  //step to 1
-		  PORTD = 0b10000000;
-		  phase_step = 1;
-		  break;
-		  case 3:
-		  //step to 2
-		  PORTD = 0b00010000;
-		  phase_step = 2;
-		  break;
-		  case 4:
-		  //step to 3;
-		  PORTD = 0b01000000;
-		  phase_step = 3;
-		  break;
-		  
-	  }
-  }//End of CW
-  
-  void step_CCW(){
-	  
-	  switch(phase_step){
-		  case 1:
-		  //step to 4
-		  PORTD = 0b00010000;
-		  phase_step = 2;
-		  break;
-		  case 2:
-		  //step to 1
-		  PORTD = 0b01000000;
-		  phase_step = 3;
-		  break;
-		  case 3:
-		  //step to 2
-		  PORTD = 0b00100000;
-		  phase_step = 4;
-		  break;
-		  case 4:
-		  //step to 3;
-		  PORTD = 0b10000000;
-		  phase_step = 1;
-		  break;
-		  
-	  }
-  }//End of CW
-  
-  
-  
-  
-  //Delay
-  void wait(volatile int N) {
+ }
 
-
-
- //*** wait ***
-
-
-
+ //}
  
+ void step_CW(){
+	 switch(phase_step){
+		 case 1:
+		 //step to 4
+		 PORTD = 0b00100000;
+		 phase_step = 4;
+		 break;
+		 case 2:
+		 //step to 1
+		 PORTD = 0b10000000;
+		 phase_step = 1;
+		 break;
+		 case 3:
+		 //step to 2
+		 PORTD = 0b00010000;
+		 phase_step = 2;
+		 break;
+		 case 4:
+		 //step to 3;
+		 PORTD = 0b01000000;
+		 phase_step = 3;
+		 break;
+		 
+	 }
+ }//End of CW
+ 
+ void step_CCW(){
+	 
+	 switch(phase_step){
+		 case 1:
+		 //step to 4
+		 PORTD = 0b00010000;
+		 phase_step = 2;
+		 break;
+		 case 2:
+		 //step to 1
+		 PORTD = 0b01000000;
+		 phase_step = 3;
+		 break;
+		 case 3:
+		 //step to 2
+		 PORTD = 0b00100000;
+		 phase_step = 4;
+		 break;
+		 case 4:
+		 //step to 3;
+		 PORTD = 0b10000000;
+		 phase_step = 1;
+		 break;
+		 
+	 }
+ }//End of CW
+ 
+ 
+ 
+ 
+ //Delay
+ void wait(volatile int N) {
 
 
 
- /* This subroutine creates a delay of N msec by calling another function.
+	 //*** wait ***
 
 
 
-   Inputs: N = number of msec for the delay (N is int, so can be up to 65,536 msec)
+	 
 
 
 
-   Outputs: None
+	 /* This subroutine creates a delay of N msec by calling another function.
 
 
 
- */
+	 Inputs: N = number of msec for the delay (N is int, so can be up to 65,536 msec)
 
 
 
- while (N>1) { // This loop creates an N msec delay
+	 Outputs: None
 
 
 
-  N--;
+	 */
 
 
 
-  delay_1_msec_raw_count();
+	 while (N>1) { // This loop creates an N msec delay
+
+
+
+		 N--;
+
+
+
+		 delay_1_msec_raw_count();
+
+
+
+	 }
+
+
+
+ } // end wait()
+
+
+
+
+
+
+
+ void delay_1_msec_raw_count() {
+
+
+
+	 //*** delay N ms **
+
+
+
+	 /* This subroutine creates a delay of N msec by using a raw time-killing count.
+
+
+
+	 Inputs: None
+
+
+
+	 Outputs: None
+
+
+
+	 */
+
+
+
+	 volatile int count = (freqclk/1000-28)/4; // each cycle takes 4 clock cycles, so count is the number of cycles needed to create a 1 msec delay.
+
+
+
+	 // 28 is the approximate number of other clock cycles used in the subroutine
+
+
+
+	 while (count > 1) { // This loop is expected to create a 1 msec delay, but it is in fact much longer. Because of the size of the variables,
+
+
+
+		 // there is a lot more that needs to be done each cycle so the loop takes much longer than 1 msec to execute.
+
+
+
+		 count--; // decrement count
+
+
+
+	 }
 
 
 
  }
-
-
-
-} // end wait()
-
-
-
-
-
-
-
-void delay_1_msec_raw_count() {
-
-
-
-    //*** delay N ms **
-
-
-
-    /* This subroutine creates a delay of N msec by using a raw time-killing count.
-
-
-
-   Inputs: None
-
-
-
-   Outputs: None
-
-
-
- */
-
-
-
- volatile int count = (freqclk/1000-28)/4; // each cycle takes 4 clock cycles, so count is the number of cycles needed to create a 1 msec delay.
-
-
-
-         // 28 is the approximate number of other clock cycles used in the subroutine
-
-
-
- while (count > 1) { // This loop is expected to create a 1 msec delay, but it is in fact much longer. Because of the size of the variables,
-
-
-
-   // there is a lot more that needs to be done each cycle so the loop takes much longer than 1 msec to execute.
-
-
-
-  count--; // decrement count
-
-
-
- }
-
-
-
-}
