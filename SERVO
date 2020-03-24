@@ -17,6 +17,7 @@ void wait(volatile int N); //For Delay
   #include <avr/io.h>
 void delay_1_msec_raw_count();
   char sensorval = 0; //dropping last two bits so can be char
+  char pass_value = 0;
 long freqclk = 16000000; //Clock freq
 
   int main(void){
@@ -64,7 +65,7 @@ long freqclk = 16000000; //Clock freq
 				  step_CW();
 				  wait(250);
 			  }
-
+                   past_value = sensorval;
 		  }
 
 	  }
