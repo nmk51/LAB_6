@@ -1,4 +1,5 @@
- /*
+  
+  /*
 
   * GccApplication2.cpp
 
@@ -9,62 +10,59 @@
   * Author : nmk51
 
   */
-
-  void step_CW(void);
-  void step_CCW(void);
-  int phase_step = 1;
+void wait(volatile int N); //For Delay
+  void step_CW(void);  //CLOCKWISE
+  void step_CCW(void); //COUNTERCLOCKWISE
+  int phase_step = 1;  //MOTOR PHASE
   #include <avr/io.h>
-
+void delay_1_msec_raw_count();
   char sensorval = 0; //dropping last two bits so can be char
+long freqclk = 16000000; //Clock freq
 
-
-  int main(void)
-
-  {
+  int main(void){
 	  
-	  DDRC = 0x00;
-	  PORTB = 0x00;
+	 DDRC = 0x00;
 	  DDRB = 0xFF;
-	  PORTB = 0x00;
+	  PORTB = 0xFF;
 	  //MOTOR CONTOLS ARE IN PORTD
 	  //MOTOR 1 are PD4 PD5
 	  //MOTOR 2 are PD6 PD7
-	  DDRD = 0xff;//LOOK AT THIS I THINK IT SHOULD BE OUTPUT
+	  DDRD = 0xFF;
 	  // DDRD = 1 << PD6 | 1<< PD5;
-	  PORTD = 0xFF;
+	  PORTD = 0x00;
 	  PRR = 0x00; //clears power reduction
 
-	  PORTC = 0xFF; //Clears all bits
+	  PORTC = 0x00; //Clears all bits//kkggg
 	  ADCSRA = 0b10000111; //enables ADC and sets freq to 128
 
 	  ADMUX = 0b01100101; //Sets reff volt, sets to left justified, connects to ADC5(PC5)
-	  ADCSRA = 1 << ADEN | 1 << ADPS2 | 1 << ADPS1 | 1 << ADPS0;
+	 
 	  
 
 	  while (1)
 
 	  {
-		  PORTB = 0x00;
+		//  PORTB = 0x00;
 		  ADCSRA |= (1<<ADSC); //Turns bit 6 on to start conversion
 
 		  while ((ADCSRA & (1<<ADIF))==0){ //Checks bit 4 to see if flag is up(finished reading)
 
 			  sensorval = ADCH; //Reads the sensor val
 			  
-			  if (sensorval < 127.5) {
+			  if (sensorval < 72.5) {
 				  //CounterClockwise
-				  //RED LIGHT ON
-				  PORTB = 0b00000100;
+				  //Green LIGHT ON
+				  PORTB = 0b11111011;
 				  step_CCW();
-				  
-				  
+				  wait(250);				  
 			  }
 			  
-			  if(sensorval >= 127.5){
+			  if (sensorval >= 72.5){
 				  //Clockwise
-				  //Green light on
-				  PORTB = 0b00000010;
-				  step_CCW();
+				  //Red light on
+				  PORTB = 0b11111101;
+				  step_CW();
+				  wait(250);
 			  }
 
 		  }
@@ -127,3 +125,109 @@
 		  
 	  }
   }//End of CW
+  
+  
+  
+  
+  //Delay
+  void wait(volatile int N) {
+
+
+
+ //*** wait ***
+
+
+
+ 
+
+
+
+ /* This subroutine creates a delay of N msec by calling another function.
+
+
+
+   Inputs: N = number of msec for the delay (N is int, so can be up to 65,536 msec)
+
+
+
+   Outputs: None
+
+
+
+ */
+
+
+
+ while (N>1) { // This loop creates an N msec delay
+
+
+
+  N--;
+
+
+
+  delay_1_msec_raw_count();
+
+
+
+ }
+
+
+
+} // end wait()
+
+
+
+
+
+
+
+void delay_1_msec_raw_count() {
+
+
+
+    //*** delay N ms **
+
+
+
+    /* This subroutine creates a delay of N msec by using a raw time-killing count.
+
+
+
+   Inputs: None
+
+
+
+   Outputs: None
+
+
+
+ */
+
+
+
+ volatile int count = (freqclk/1000-28)/4; // each cycle takes 4 clock cycles, so count is the number of cycles needed to create a 1 msec delay.
+
+
+
+         // 28 is the approximate number of other clock cycles used in the subroutine
+
+
+
+ while (count > 1) { // This loop is expected to create a 1 msec delay, but it is in fact much longer. Because of the size of the variables,
+
+
+
+   // there is a lot more that needs to be done each cycle so the loop takes much longer than 1 msec to execute.
+
+
+
+  count--; // decrement count
+
+
+
+ }
+
+
+
+}
