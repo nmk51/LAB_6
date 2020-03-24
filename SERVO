@@ -18,6 +18,10 @@ void wait(volatile int N); //For Delay
 void delay_1_msec_raw_count();
   char sensorval = 0; //dropping last two bits so can be char
   char pass_value = 0;
+  //ALL MUST BE INTERGERS BELOW
+  int X = 0; //Difference between last value and current value
+  int i = 0;//Iteration
+  int N = 0;//Number of steps
 long freqclk = 16000000; //Clock freq
 
   int main(void){
@@ -65,7 +69,31 @@ long freqclk = 16000000; //Clock freq
 				  step_CW();
 				  wait(250);
 			  }
+			//  X = sensorval - past_value;
+			//N = step/volt*X;
+		//if (X > 0){
+		//Turn on CW Light
+		//for (i : N){
+		//step_CW();
+		//wait(250);
+		//i++
+		//}
+		//}
+		//if(X = 0){
+		//} //DO NOTHING
+		//if(X < 0){
+		//Turn on Counter Clockwise Light
+		//For(i : N){
+		//step_CCW();
+		//wait(250);
+		i++
+		//}
+		//}
+			  
+			  
+			  
                    past_value = sensorval;
+		   i = 0;
 		  }
 
 	  }
