@@ -1,4 +1,4 @@
- /*
+/*
 
  * GccApplication2.cpp
 
@@ -14,6 +14,7 @@
  void step_CCW(void); //COUNTERCLOCKWISE
  int phase_step = 1;  //MOTOR PHASE
  #include <avr/io.h>
+ #include <math.h>
  void delay_1_msec_raw_count();
  char sensorval = 0; //dropping last two bits so can be char
  char pass_value = 0;
@@ -22,6 +23,8 @@
  int i = 0;//Iteration
  int Z = 0;//Number of steps
  long freqclk = 16000000; //Clock freq
+ int b = 0;
+ int y = 1;
 
  int main(void){
 	 
@@ -71,35 +74,61 @@
 			 //}
 			 ////END OF COMMENTS//
 			 
-			 //NEED COMMENTING OUT
+			 //TEMPORARY COMMENTING OUT????
 			 X = sensorval - pass_value;
-			 Z = (1)*X;
+			 Z = round(.2*X);
 			 ///taking out
 			 wait(50);
 			 if (X > 0){ //&& X > 5){
 				 //Turn on CW Light
-				 PORTB = 0b11111101;
-				 //for ((i=0);(i=Z);(i++)){
-				for ((i=0);(i<=5);i++){
+				PORTB = 0b11111101;
+				// for ((i=0);(i=Z);(i++)){
+				for ((i=0);(i<=Z);i++){
+					 step_CCW();
+					 wait(250);
+					 //i++
+					 y = 1;
+				 }
+				}
+			 //end
+			 //if(X == 0){
+			 //} //DO NOTHING
+			 else if(X < 0 && y == 0){//&& X < -5){
+				 //Turn on Counter Clockwise Light
+				 PORTB = 0b11111011;
+				 //for((i=0);(i=Z);(i++)){
+					 for ((i=0);(i<=Z);i++){
 					 step_CW();
 					 wait(250);
 					 //i++
 				 }
 			 }
-			 //end
-			 if(X == 0){
-			 } //DO NOTHING
-			 if(X < 0 ){//&& X < -5){
-				 //Turn on Counter Clockwise Light
-				 PORTB = 0b11111011;
-				 //for((i=0);(i=Z);(i++)){
-					 for ((i=0);(i<=5);i++){
-					 step_CCW();
-					 wait(250);
-					 //i++
-				 }
-			 }
-			 ///END OF COMMENTS
+			 ///END OF COMMENTS??????
+			// b = round(0.18*sensorval);
+			 //if(sensorval < 2.5){
+				// for((i=0);(i<=b);(i++)){
+					// PORTB = 0b11111011;
+					 //step_CCW();
+					 //wait(250);
+					 //i++;
+					 
+				 //}
+				 
+				 
+			 //}
+			 //if(sensorval > 2.5){
+				//  for((i=0);(i<=b);(i++)){
+					//  PORTB = 0b11111101;
+					  //step_CW();
+					  //wait(250);
+					  //i++;
+					  
+				  //}
+				 
+				 
+			 //}
+			 
+			 
 			// X = sensorval/5;
 			 //while (pass_value != sensorval){
 			 //for((i=0);(i>=X);(i++)){
@@ -110,7 +139,8 @@
 			 //}
 			  //PORTB = 0b11111111;
 			 pass_value = sensorval;
-			 //i = 0;
+			 i = 0;
+			 y = 0;
 		 }
 //pass_value = sensorval;
 	 }
